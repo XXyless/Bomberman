@@ -1,9 +1,15 @@
-#pragma once
+#ifndef _CHMAT_H_GUARD_
+#define _CHMAT_H_GUARD_
 
 #include <iostream>
 #include <windows.h>
 #include <vector>
-#include "Properties.h"
+
+constexpr auto CHMAT_ERR_UNEXPECTED_TYPE = "Error, unexpected type!";
+constexpr auto CHMAT_ERR_CODE_UNEXPECTED_TYPE = 0;
+
+constexpr auto CHMAT_ERR_OUT_OF_BOUND = "Error, out of bound!";
+constexpr auto CHMAT_ERR_CODE_OUT_OF_BOUND = 1;
 
 int FillBMPInfo(BITMAPINFO* info, int x, int y, int bits);
 
@@ -11,10 +17,10 @@ template <typename T>
 class CHMAT {
 public:
 	T* data;
-	int x, y;
+	int x, y, bg_color;
 	HBITMAP HBitmap;
 public:
-	CHMAT(int x, int y);
+	CHMAT(int x, int y, int bg_color);
 	~CHMAT();
 
 	template <typename C>
@@ -25,6 +31,8 @@ public:
 
 	void print_mat();
 	void printnumber(int x0, int y0, int number, int c, int b);
+
+	bool inRange(int x, int y);
 
 public:
 	void operator = (T a);
@@ -38,13 +46,11 @@ public:
 	void operator /= (T a);
 
 	T& operator ()(int x, int y);
-
-private:
-	bool inRange(int x, int y);
 };
+#endif // !_CHMAT_H_GUARD_
 
 template<typename T>
-inline CHMAT<T>::CHMAT(int x, int y) {
+inline CHMAT<T>::CHMAT(int x, int y, int bg_color) {
 	int iType;
 	unsigned char ucType;
 
@@ -59,6 +65,16 @@ inline CHMAT<T>::CHMAT(int x, int y) {
 
 	this->x = x;
 	this->y = y;
+	this->bg_color = bg_color;
+
+	int a, b;
+	for (b = 0; b < this->y; b++)
+	{
+		for (a = 0; a < this->x; a++)
+		{
+			this->data[b * this->x + a] = this->bg_color;
+		}
+	}
 }
 
 template<typename T>
@@ -87,7 +103,7 @@ inline void CHMAT<T>::print_mat() {
 
 template<typename T>
 inline bool CHMAT<T>::inRange(int x, int y) {
-	return !((x < 1) && (x > this->x) && (y < 1) && (y > this->y));
+	return (x > 0) and (x < this->x) and (y > 0) and (y < this->y);
 }
 
 template<typename T>
@@ -97,8 +113,8 @@ inline void CHMAT<T>::set(int x, int y, C val) {
 		this->data[(y - 1) * this->x + (x - 1)] = val;
 	}
 	else {
-		std::cout << errors::OUT_OF_BOUND_MESSAGE;
-		exit(errors::OUT_OF_BOUND_CODE);
+		std::cout << CHMAT_ERR_OUT_OF_BOUND;
+		exit(CHMAT_ERR_CODE_OUT_OF_BOUND);
 	}
 }
 
