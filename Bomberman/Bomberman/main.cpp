@@ -198,7 +198,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	 -#-#-#-#-#- 
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
-	 -#-#-#-#-#-
+	  #-#-#-#-#
 	 * ------- *
 	 GİTHUBA PUSHLUYORUM BU AKŞAMLIK SALALIM MI? OLUR REİS YARIN DEVAM EDERİZ - TAMAMDIR
 	 
