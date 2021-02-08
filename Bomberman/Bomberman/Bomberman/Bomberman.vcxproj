@@ -149,12 +149,14 @@
   <ItemGroup>
     <ClCompile Include="Bomb.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bomb.h" />
     <ClInclude Include="CHMAT.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="Messages.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>

@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
-#include "chmat.h"
 #include <thread>
 #include <chrono>
 #include <vector>
@@ -10,25 +9,27 @@
 #include <memory>
 #include <random>
 #include <array>
+#include "CHMAT.h"
 #include "Properties.h"
+#include "Player.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);
 VOID CALLBACK start_game();
 
 
-CHMAT<int>								GameScreen(WINDOW_WIDTH - 10, WINDOW_HEIGHT - 10, GREEN);
+CHMAT<int>								GameScreen(GAME_WIDTH, GAME_HEIGHT, BG_COLOR);
 HANDLE hTimerQueue = nullptr;
 
 
 HANDLE									player_threads[PLAYER_COUNT];
-std::vector <std::vector <int>>			player_coordinates(PLAYER_COUNT, std::vector <int>(2, 0));
-int										player_id[PLAYER_COUNT] = { 0, 1, 2, 3};
+// std::vector <Player*>					players(PLAYER_COUNT);
 
-bool MOVEMENT_DONE[]	= { true, true, true, true, true, true, true, true, true, true };
-bool DRAWING_DONE		= false;
+bool MOVEMENT_DONE[] = { true, true, true, true, true, true, true, true, true, true };
+bool DRAWING_DONE = true;
 
 VOID* Update(LPVOID param) {
+	/*
 	DRAWING_DONE	= false;
 	bool wait		= true;
 	while (wait) {
@@ -40,53 +41,48 @@ VOID* Update(LPVOID param) {
 			wait = false;
 		}
 	}
-
+	*/
 	// KUTULAR MUTULAR DRAW
 	SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
-	DRAWING_DONE	=	true;
+	// DRAWING_DONE	=	true;
+	return 0;
 }
 
-
+void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
+	for (auto x = 0; x < box_width; ++x)
+		for (auto y = 0; y < box_height; ++y)
+			GameScreen(box_x + x, box_y + y) = color;
+}
+/*
 DWORD WINAPI PlayerThread(LPVOID param) {
-	int* tm = (int*)param;
-	int my_id = *tm;
+//	Player* myself = reinterpret_cast<Player*>(param);
 
-	int x, y, speed = PLAYER_SPEED;
-	if (my_id == 0) {
-		x = 1;
-		y = 1;
-	}
-	else if(my_id == 1){
 
-	}
-	else if (my_id == 2) {
-
-	}
-	else {
-
-	}
+	bool left, right, up, down;
 
 	while (GAME_STARTED) {
-		if (PLAYER_DIRECTION_LEFT) {
-			if (x - PLAYER_SPEED > 1) x -= PLAYER_SPEED;
-			else x = 1;
-		}
-		else if (PLAYER_DIRECTION_RIGHT) {
-			if (x + PLAYER_SPEED < GameScreen.x - PLAYER_WIDTH) x += PLAYER_SPEED;
-			else x = GameScreen.x - PLAYER_WIDTH;
-		}
+		if (DRAWING_DONE) {
+			//MOVEMENT_DONE[my_id]	=	false;
 
-		if (PLAYER_DIRECTION_UP) {
-			if (y+ PLAYER_SPEED < m.y - PLAYER_HEIGHT) y+= PLAYER_SPEED;
-			else y= m.y - PLAYER_HEIGHT;
+			if (myself->id == 0) {
+				left	=	PLAYER_DIRECTION_LEFT;
+				right	=	PLAYER_DIRECTION_RIGHT;
+				up		=	PLAYER_DIRECTION_UP;
+				down	=	PLAYER_DIRECTION_DOWN;
+
+				myself->move(left, right, up, down);
+			}
+			else {
+				myself->move();
+			}
+
+			//MOVEMENT_DONE[my_id] = true;
 		}
-		else if (PLAYER_DIRECTION_DOWN) {
-			if (y- PLAYER_SPEED > 0) y-= PLAYER_SPEED;
-			else y= 1;
-		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(15));
 	}
+	return 0;
 }
-
+*/
 
 VOID CALLBACK start_game() {
 	DWORD ThreadID;
@@ -96,13 +92,19 @@ VOID CALLBACK start_game() {
 	{
 		return;
 	}
-	// GAME_STARTED = true;
-	
+	GAME_STARTED = true;
+
 	// SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
 
-	
-	for (size_t current_player = 0; current_player < PLAYER_COUNT; current_player++){
-		player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, &player_id[current_player], 0, &ThreadID);
+	int x, y;
+	COLOR c;
+	for (size_t current_player = 0; current_player < PLAYER_COUNT; current_player++) {
+		if (current_player == 0) { x = 1; y = GAME_HEIGHT - PLAYER_HEIGHT - 1; c = GREEN; }
+		else if (current_player == 1) { x = GAME_WIDTH - PLAYER_WIDTH - 1; y = GAME_HEIGHT - PLAYER_HEIGHT - 1; c = RED; }
+		else if (current_player == 2) { x = GAME_WIDTH - PLAYER_WIDTH - 1; y = 1; c = WHITE; }
+		else { x = 1; y = 1; c = YELLOW; }
+		// players.push_back(new Player(current_player, PLAYER_WIDTH, PLAYER_HEIGHT, x, y, PLAYER_SPEED, c, BG_COLOR, &GameScreen));
+		// player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(&players[current_player]), 0, &ThreadID);
 	}
 
 
@@ -120,13 +122,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		break;
 	case WM_KEYDOWN:
 		PRESSED_KEY = (int)wParam;
-		if (PRESSED_KEY == 'p' or PRESSED_KEY == 'P') {
-			
-		}
+		if (PRESSED_KEY == VK_LEFT)	PLAYER_DIRECTION_LEFT = true;
+		else if (PRESSED_KEY == VK_RIGHT)	PLAYER_DIRECTION_RIGHT = true;
+		else if (PRESSED_KEY == VK_UP)		PLAYER_DIRECTION_UP = true;
+		else if (PRESSED_KEY == VK_DOWN)	PLAYER_DIRECTION_DOWN = true;
+
+		break;
+	case WM_KEYUP:
+		RELEASED_KEY = (int)wParam;
+		if (RELEASED_KEY == VK_LEFT)		PLAYER_DIRECTION_LEFT = false;
+		else if (RELEASED_KEY == VK_RIGHT)	PLAYER_DIRECTION_RIGHT = false;
+		else if (RELEASED_KEY == VK_UP)		PLAYER_DIRECTION_UP = false;
+		else if (RELEASED_KEY == VK_DOWN)		PLAYER_DIRECTION_DOWN = false;
+		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-		
+
 		default:
 			break;
 		}
@@ -192,14 +204,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 /*
 	 * ------- *
-	  #-#-#-#-# 
+	  #-#-#-#-#
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
-	 -#-#-#-#-#- 
+	 -#-#-#-#-#-
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
 	  #-#-#-#-#
 	 * ------- *
-	 GİTHUBA PUSHLUYORUM BU AKŞAMLIK SALALIM MI? OLUR REİS YARIN DEVAM EDERİZ - TAMAMDIR
-	 
+
 */
+
+

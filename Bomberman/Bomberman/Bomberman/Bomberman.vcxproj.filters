@@ -21,6 +21,9 @@
     <ClCompile Include="Bomb.cpp">
       <Filter>Kaynak Dosyalar</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Kaynak Dosyalar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CHMAT.h">
@@ -39,6 +42,9 @@
       <Filter>Üst Bilgi Dosyaları</Filter>
     </ClInclude>
     <ClInclude Include="Bomb.h">
+      <Filter>Üst Bilgi Dosyaları</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
       <Filter>Üst Bilgi Dosyaları</Filter>
     </ClInclude>
   </ItemGroup>

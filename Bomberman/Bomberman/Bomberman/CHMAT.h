@@ -1,5 +1,6 @@
 #ifndef _CHMAT_H_GUARD_
 #define _CHMAT_H_GUARD_
+#pragma once
 
 #include <iostream>
 #include <windows.h>
