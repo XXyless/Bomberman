@@ -28,50 +28,50 @@ void Player::draw(int c) {
 }
 
 COORDINATES Player::move() {
+	this->moving = true;
 	MOVES movement = this->random_move();
-
 	return this->move(movement.left, movement.right, movement.up, movement.down);
 }
 
 COORDINATES Player::move(bool left, bool right, bool up, bool down) {
+	this->moving = true;
 	this->draw(this->bg);
 
 	if (left) {
-		if (this->x - this->s > 1) {
+		if (this->x - this->s > 2) {
 			this->x -= this->s;
 		}
 		else {
-			this->x = 1;
+			this->x = 2;
 		}
 	}
 	else if (right) {
-		if (this->x + this->s + this->w < this->GameScreen->x) {
+		if (this->x + this->s + this->w < this->GameScreen->x - 2) {
 			this->x += this->s;
 		}
 		else {
-			this->x = this->GameScreen->x - this->w - 1;
+			this->x = this->GameScreen->x - this->w - 2;
 		}
 	}
 
 	if (up) {
-		if (this->y + this->s + this->h < this->GameScreen->y) {
+		if (this->y + this->s + this->h < this->GameScreen->y - 2) {
 			this->y += this->s;
 		}
 		else {
-			this->y = this->GameScreen->y - this->h - 1;
+			this->y = this->GameScreen->y - this->h - 2;
 		}
 	}
 	else if (down) {
-		if (this->y - this->s > 1) {
+		if (this->y - this->s > 2) {
 			this->y -= this->s;
 		}
 		else {
-			this->y = 1;
+			this->y = 2;
 		}
 	}
 
 	this->draw(this->c);
-
 	return { this->x, this->y };
 }
 

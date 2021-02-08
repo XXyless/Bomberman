@@ -23,7 +23,7 @@ HANDLE hTimerQueue = nullptr;
 
 
 HANDLE									player_threads[PLAYER_COUNT];
-// std::vector <Player*>					players(PLAYER_COUNT);
+std::vector <Player*>					players(PLAYER_COUNT);
 
 bool MOVEMENT_DONE[] = { true, true, true, true, true, true, true, true, true, true };
 bool DRAWING_DONE = true;
@@ -53,9 +53,9 @@ void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 		for (auto y = 0; y < box_height; ++y)
 			GameScreen(box_x + x, box_y + y) = color;
 }
-/*
+
 DWORD WINAPI PlayerThread(LPVOID param) {
-//	Player* myself = reinterpret_cast<Player*>(param);
+	Player* myself = reinterpret_cast<Player*>(param);
 
 
 	bool left, right, up, down;
@@ -63,26 +63,27 @@ DWORD WINAPI PlayerThread(LPVOID param) {
 	while (GAME_STARTED) {
 		if (DRAWING_DONE) {
 			//MOVEMENT_DONE[my_id]	=	false;
+			if (not myself->moving) {
+				if (myself->id == 0) {
+					left = PLAYER_DIRECTION_LEFT;
+					right = PLAYER_DIRECTION_RIGHT;
+					up = PLAYER_DIRECTION_UP;
+					down = PLAYER_DIRECTION_DOWN;
 
-			if (myself->id == 0) {
-				left	=	PLAYER_DIRECTION_LEFT;
-				right	=	PLAYER_DIRECTION_RIGHT;
-				up		=	PLAYER_DIRECTION_UP;
-				down	=	PLAYER_DIRECTION_DOWN;
-
-				myself->move(left, right, up, down);
+					myself->move(left, right, up, down);
+				}
+				else {
+					myself->move();
+				}
+				myself->moving = false;
 			}
-			else {
-				myself->move();
-			}
-
 			//MOVEMENT_DONE[my_id] = true;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(15));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 	return 0;
 }
-*/
+
 
 VOID CALLBACK start_game() {
 	DWORD ThreadID;
@@ -103,8 +104,8 @@ VOID CALLBACK start_game() {
 		else if (current_player == 1) { x = GAME_WIDTH - PLAYER_WIDTH - 1; y = GAME_HEIGHT - PLAYER_HEIGHT - 1; c = RED; }
 		else if (current_player == 2) { x = GAME_WIDTH - PLAYER_WIDTH - 1; y = 1; c = WHITE; }
 		else { x = 1; y = 1; c = YELLOW; }
-		// players.push_back(new Player(current_player, PLAYER_WIDTH, PLAYER_HEIGHT, x, y, PLAYER_SPEED, c, BG_COLOR, &GameScreen));
-		// player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(&players[current_player]), 0, &ThreadID);
+		players.push_back(new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, BG_COLOR, &GameScreen));
+		player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(&players[current_player]), 0, &ThreadID);
 	}
 
 
