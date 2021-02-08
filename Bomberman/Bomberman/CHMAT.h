@@ -12,7 +12,7 @@ constexpr auto CHMAT_ERR_CODE_UNEXPECTED_TYPE = 0;
 constexpr auto CHMAT_ERR_OUT_OF_BOUND = "Error, out of bound!";
 constexpr auto CHMAT_ERR_CODE_OUT_OF_BOUND = 1;
 
-int FillBMPInfo(BITMAPINFO* info, int x, int y, int bits);
+inline int FillBMPInfo(BITMAPINFO* info, int x, int y, int bits);
 
 template <typename T>
 class CHMAT {
@@ -61,7 +61,7 @@ inline CHMAT<T>::CHMAT(int x, int y, int bg_color) {
 		this->HBitmap = CreateDIBSection(NULL, &binfo, DIB_RGB_COLORS, (void**)&data, NULL, NULL);
 	}
 	else if (typeid(ucType) == typeid(*this->data)) {
-		this->data = new T[x * y]();
+		this->data = new T[x*y]();
 	}
 
 	this->x = x;

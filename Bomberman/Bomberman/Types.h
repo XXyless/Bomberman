@@ -23,3 +23,4 @@ struct moves {
 
 typedef coordinates COORDINATES;
 typedef moves MOVES;
+

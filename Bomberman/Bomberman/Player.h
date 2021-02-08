@@ -4,7 +4,7 @@
 
 #include "CHMAT.h"
 #include <random>
-
+#include "Types.h"
 
 class Player
 {
