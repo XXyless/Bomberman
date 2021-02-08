@@ -24,6 +24,7 @@ HANDLE hTimerQueue = nullptr;
 
 HANDLE									player_threads[PLAYER_COUNT];
 std::vector <Player*>					players(PLAYER_COUNT);
+// std::vector <MOVES>						player_moves(PLAYER_COUNT);
 
 bool MOVEMENT_DONE[] = { true, true, true, true, true, true, true, true, true, true };
 bool DRAWING_DONE = true;
@@ -54,32 +55,20 @@ void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 			GameScreen(box_x + x, box_y + y) = color;
 }
 
+
+
 DWORD WINAPI PlayerThread(LPVOID param) {
 	Player* myself = reinterpret_cast<Player*>(param);
-
-
-	bool left, right, up, down;
-
+	
 	while (GAME_STARTED) {
 		if (DRAWING_DONE) {
+			drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, myself->c);
 			//MOVEMENT_DONE[my_id]	=	false;
-			if (not myself->moving) {
-				if (myself->id == 0) {
-					left = PLAYER_DIRECTION_LEFT;
-					right = PLAYER_DIRECTION_RIGHT;
-					up = PLAYER_DIRECTION_UP;
-					down = PLAYER_DIRECTION_DOWN;
-
-					myself->move(left, right, up, down);
-				}
-				else {
-					myself->move();
-				}
-				myself->moving = false;
-			}
+			myself->move();
 			//MOVEMENT_DONE[my_id] = true;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, BG_COLOR);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	return 0;
 }
@@ -89,10 +78,8 @@ VOID CALLBACK start_game() {
 	DWORD ThreadID;
 	HANDLE hTimer = NULL;
 	hTimerQueue = CreateTimerQueue();
-	if (NULL == hTimerQueue)
-	{
-		return;
-	}
+	if (NULL == hTimerQueue) { return; }
+
 	GAME_STARTED = true;
 
 	// SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
@@ -100,15 +87,17 @@ VOID CALLBACK start_game() {
 	int x, y;
 	COLOR c;
 	for (size_t current_player = 0; current_player < PLAYER_COUNT; current_player++) {
-		if (current_player == 0) { x = 1; y = GAME_HEIGHT - PLAYER_HEIGHT - 1; c = GREEN; }
-		else if (current_player == 1) { x = GAME_WIDTH - PLAYER_WIDTH - 1; y = GAME_HEIGHT - PLAYER_HEIGHT - 1; c = RED; }
-		else if (current_player == 2) { x = GAME_WIDTH - PLAYER_WIDTH - 1; y = 1; c = WHITE; }
-		else { x = 1; y = 1; c = YELLOW; }
-		players.push_back(new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, BG_COLOR, &GameScreen));
+		// player_moves[current_player].left = false; player_moves[current_player].right = false; player_moves[current_player].up = false; player_moves[current_player].down = false;
+
+		if		(current_player == 0)	{ x = 10 ;y = GAME_HEIGHT - PLAYER_HEIGHT - 10; c = GREEN; }
+		else if (current_player == 1)	{ x = GAME_WIDTH - PLAYER_WIDTH - 10; y = 10; c = WHITE; }
+
+		players.push_back(new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, GAME_WIDTH, GAME_HEIGHT));
+		// player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, NULL, 0, &ThreadID);
 		player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(&players[current_player]), 0, &ThreadID);
+		break;
 	}
-
-
+	
 	// draw_boxes()
 	CreateTimerQueueTimer(&hTimer, hTimerQueue, (WAITORTIMERCALLBACK)Update, NULL, 0, 1000 / FRAME_COUNT, 0);
 }
@@ -123,18 +112,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		break;
 	case WM_KEYDOWN:
 		PRESSED_KEY = (int)wParam;
-		if (PRESSED_KEY == VK_LEFT)	PLAYER_DIRECTION_LEFT = true;
-		else if (PRESSED_KEY == VK_RIGHT)	PLAYER_DIRECTION_RIGHT = true;
-		else if (PRESSED_KEY == VK_UP)		PLAYER_DIRECTION_UP = true;
-		else if (PRESSED_KEY == VK_DOWN)	PLAYER_DIRECTION_DOWN = true;
+		if		(PRESSED_KEY == VK_LEFT)	{ players[0]->moves.left	= true; }
+		else if (PRESSED_KEY == VK_RIGHT)	{ players[0]->moves.right	= true; }
+		else if (PRESSED_KEY == VK_UP)		{ players[0]->moves.up		= true; }
+		else if (PRESSED_KEY == VK_DOWN)	{ players[0]->moves.down	= true; }
 
 		break;
 	case WM_KEYUP:
 		RELEASED_KEY = (int)wParam;
-		if (RELEASED_KEY == VK_LEFT)		PLAYER_DIRECTION_LEFT = false;
-		else if (RELEASED_KEY == VK_RIGHT)	PLAYER_DIRECTION_RIGHT = false;
-		else if (RELEASED_KEY == VK_UP)		PLAYER_DIRECTION_UP = false;
-		else if (RELEASED_KEY == VK_DOWN)		PLAYER_DIRECTION_DOWN = false;
+		if		(RELEASED_KEY == VK_LEFT)	{ players[0]->moves.left	= false; }
+		else if (RELEASED_KEY == VK_RIGHT)	{ players[0]->moves.right	= false; }
+		else if (RELEASED_KEY == VK_UP)		{ players[0]->moves.up		= false; }
+		else if (RELEASED_KEY == VK_DOWN)	{ players[0]->moves.down	= false; }
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -217,3 +206,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 */
 
 
+/*
+* 
+bool BOX_DIRECTION_LEFT = false, BOX_DIRECTION_RIGHT = false, BOX_DIRECTION_UP = false, BOX_DIRECTION_DOWN = false;
+int BOX_SPEED = 1;
+int BOX_WIDTH = 20;
+int BOX_HEIGHT = 20;
+int BOX_LOCATION_X = 150, BOX_LOCATION_Y = 150;
+COLOR BOX_COLOR = ORANGE;
+*/

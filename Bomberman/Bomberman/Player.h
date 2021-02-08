@@ -10,20 +10,21 @@ class Player
 {
 public:
 	int id;
-	int x, y;
-	int w, h;
+	COORDINATES coordinates;
+	_SIZE w, h;
 	int s;
-	int c, bg;
+	COLOR c;
 	bool moving;
-	CHMAT <int>* GameScreen;
+	int area_width, area_height;
+	MOVES moves;
 public:
-	Player(int id, int w, int h, int x, int y, int s, int c, int bg, CHMAT<int>* screen);
+	Player(_ID id, int x, int y, _SIZE w, _SIZE h, int s, COLOR c, _SIZE area_width, _SIZE area_height);
 	~Player();
 
 public:
-	void draw(int c);
+	
 	COORDINATES move();
-	COORDINATES move(bool left, bool right, bool up, bool down);
+	// COORDINATES move(bool left, bool right, bool up, bool down);
 
 private:
 	MOVES random_move();

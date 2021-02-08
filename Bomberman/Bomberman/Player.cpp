@@ -1,78 +1,51 @@
 #include "Player.h"
 
 
-Player::Player(int id, int x, int y, int w, int h, int s, int c, int bg, CHMAT<int>* screen) {
+Player::Player(_ID id, int x, int y, _SIZE w, _SIZE h, int s, COLOR c, _SIZE area_width, _SIZE area_height) {
 	this->id = id;
-	this->x = x;
-	this->y = y;
-	this->w = w;
-	this->h = h;
+
+	this->coordinates.x = x, this->coordinates.y = y;
+	this->w = w, this->h = h;
 	this->c = c;
 	this->s = s;
-	this->moving = false;
-	this->GameScreen = screen;
+	this->area_width = area_width, this->area_height = area_height;
 
-
-
-	this->draw(c);
+	this->moves.left = false; this->moves.right = false; this->moves.up = false; this->moves.down = false;
 }
 
-Player::~Player() {
-	delete this->GameScreen;
-}
+Player::~Player() {}
 
-void Player::draw(int c) {
-	for (auto x = 0; x < this->w; ++x)
-		for (auto y = 0; y < this->h; ++y)
-			this->GameScreen->set(this->x + x, this->y + y, c);
-}
-
+/*
 COORDINATES Player::move() {
 	this->moving = true;
 	MOVES movement = this->random_move();
 	return this->move(movement.left, movement.right, movement.up, movement.down);
 }
+*/
 
-COORDINATES Player::move(bool left, bool right, bool up, bool down) {
-	this->moving = true;
-	this->draw(this->bg);
-
-	if (left) {
-		if (this->x - this->s > 2) {
-			this->x -= this->s;
-		}
-		else {
-			this->x = 2;
-		}
-	}
-	else if (right) {
-		if (this->x + this->s + this->w < this->GameScreen->x - 2) {
-			this->x += this->s;
-		}
-		else {
-			this->x = this->GameScreen->x - this->w - 2;
-		}
+COORDINATES Player::move() {
+	
+	if (this->moves.left) {
+		if (this->coordinates.x -	this->s > 1)	{ this->coordinates.y -=	this->s; }
+		else	{ this->coordinates.x = 2; }
 	}
 
-	if (up) {
-		if (this->y + this->s + this->h < this->GameScreen->y - 2) {
-			this->y += this->s;
-		}
-		else {
-			this->y = this->GameScreen->y - this->h - 2;
-		}
-	}
-	else if (down) {
-		if (this->y - this->s > 2) {
-			this->y -= this->s;
-		}
-		else {
-			this->y = 2;
-		}
+	else if (this->moves.right) {
+		if (this->coordinates.x + this->s + this->w < this->area_width)	{ this->coordinates.x += this->s; }
+		else	{ this->coordinates.x = this->area_width - this->w - 1; }
 	}
 
-	this->draw(this->c);
-	return { this->x, this->y };
+	if (this->moves.up) {
+		if	(this->coordinates.y + this->s + this->h < this->area_height - 2)	{ this->coordinates.y += this->s; }
+		else	{ this->coordinates.y = this->area_height - this->h - 2; }
+	}
+
+	else if (this->moves.down) {
+		if	(this->coordinates.y - this->s > 2)	{ this->coordinates.y -= this->s; }
+		else	{ this->coordinates.y = 2; }
+	}
+
+	return	{ this->coordinates.x, this->coordinates.y };
 }
 
 MOVES Player::random_move()
