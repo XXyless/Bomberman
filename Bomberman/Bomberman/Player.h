@@ -2,6 +2,10 @@
 #define PLAYER_H
 #pragma once
 
+#include "CHMAT.h"
+#include <random>
+
+
 class Player
 {
 public:
@@ -11,7 +15,7 @@ public:
 	int s;
 	int c, bg;
 	bool moving;
-	CHMAT<int>* GameScreen;
+	CHMAT <int>* GameScreen;
 public:
 	Player(int id, int w, int h, int x, int y, int s, int c, int bg, CHMAT<int>* screen);
 	~Player();
