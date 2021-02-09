@@ -26,7 +26,7 @@ COORDINATES Player::move() {
 COORDINATES Player::move() {
 	
 	if (this->moves.left) {
-		if (this->coordinates.x -	this->s > 1)	{ this->coordinates.y -=	this->s; }
+		if (this->coordinates.x -	this->s > 1)	{ this->coordinates.x -=	this->s; }
 		else	{ this->coordinates.x = 2; }
 	}
 

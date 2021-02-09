@@ -61,8 +61,6 @@ void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 DWORD WINAPI PlayerThread(LPVOID param) {
 	Player* myself = reinterpret_cast<Player*>(param);
 
-	
-	
 	while (GAME_STARTED) {
 		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, BG_COLOR);
 		//if (DRAWING_DONE) {
@@ -71,8 +69,8 @@ DWORD WINAPI PlayerThread(LPVOID param) {
 			//MOVEMENT_DONE[my_id] = true;
 		//}
 
-		// drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, myself->c);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, myself->c);
+		std::this_thread::sleep_for(std::chrono::milliseconds(35));
 	}
 
 	return 0;
@@ -94,12 +92,12 @@ VOID CALLBACK start_game() {
 	for (size_t current_player = 0; current_player < PLAYER_COUNT; current_player++) {
 		// player_moves[current_player].left = false; player_moves[current_player].right = false; player_moves[current_player].up = false; player_moves[current_player].down = false;
 
-		if		(current_player == 0)	{ x = 100 ;y = GAME_HEIGHT - PLAYER_HEIGHT - 100; c = GREEN; }
+ 		if		(current_player == 0)	{ x = 100 ;y = GAME_HEIGHT - PLAYER_HEIGHT - 100; c = GREEN; }
 		else if (current_player == 1)	{ x = GAME_WIDTH - PLAYER_WIDTH - 100; y = 100; c = WHITE; }
 
-		players.push_back(new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, GAME_WIDTH, GAME_HEIGHT));
+		players[current_player] = new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, GAME_WIDTH, GAME_HEIGHT);
 		// player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, NULL, 0, &ThreadID);
-		player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(&players[current_player]), 0, &ThreadID);
+		player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(players[current_player]), 0, &ThreadID);
 	}
 	
 	// draw_boxes()
