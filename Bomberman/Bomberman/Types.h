@@ -10,7 +10,6 @@ typedef int _ID;
 
 typedef int _SIZE;
 
-typedef char _KEY;
 typedef bool _BOOL;
 
 struct coordinates {

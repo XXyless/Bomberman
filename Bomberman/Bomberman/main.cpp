@@ -119,6 +119,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (PRESSED_KEY == VK_UP)		{ players[0]->moves.up		= true; }
 		else if (PRESSED_KEY == VK_DOWN)	{ players[0]->moves.down	= true; }
 
+		else if	(PRESSED_KEY == 'A' or PRESSED_KEY == 'a')	{ players[1]->moves.left	= true; }
+		else if (PRESSED_KEY == 'D' or PRESSED_KEY == 'd')	{ players[1]->moves.right	= true; }
+		else if (PRESSED_KEY == 'W' or PRESSED_KEY == 'w')	{ players[1]->moves.up		= true; }
+		else if (PRESSED_KEY == 'S' or PRESSED_KEY == 's')	{ players[1]->moves.down	= true; }
 		break;
 	case WM_KEYUP:
 		RELEASED_KEY = (int)wParam;
@@ -126,6 +130,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (RELEASED_KEY == VK_RIGHT)	{ players[0]->moves.right	= false; }
 		else if (RELEASED_KEY == VK_UP)		{ players[0]->moves.up		= false; }
 		else if (RELEASED_KEY == VK_DOWN)	{ players[0]->moves.down	= false; }
+
+		else if	(PRESSED_KEY == 'A' or PRESSED_KEY == 'a')	{ players[1]->moves.left	= false; }
+		else if (PRESSED_KEY == 'D' or PRESSED_KEY == 'd')	{ players[1]->moves.right	= false; }
+		else if (PRESSED_KEY == 'W' or PRESSED_KEY == 'w')	{ players[1]->moves.up		= false; }
+		else if (PRESSED_KEY == 'S' or PRESSED_KEY == 's')	{ players[1]->moves.down	= false; }
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))

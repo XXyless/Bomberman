@@ -33,8 +33,8 @@ _SIZE			GAME_WIDTH					=	WINDOW_WIDTH - 50;
 _SIZE			GAME_HEIGHT					=	WINDOW_HEIGHT - 100;
 
 
-_KEY			PRESSED_KEY					=	0;
-_KEY			RELEASED_KEY				=	0;
+int				PRESSED_KEY					=	0;
+int				RELEASED_KEY				=	0;
 
 
 _BOOL			GAME_STARTED				=	false;
@@ -57,9 +57,5 @@ _SIZE			PLAYER_HEIGHT				=	20;
 
 COLOR			BG_COLOR					=	BLACK;
 
-int FIRST_LEFT	= VK_LEFT;
-int FIRST_RIGHT = VK_RIGHT;
-int FIRST_UP	= VK_UP;
-int FIRST_DOWN	= VK_DOWN;
 
 #endif //!PROPERTIES_H
