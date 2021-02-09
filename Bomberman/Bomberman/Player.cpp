@@ -45,6 +45,7 @@ COORDINATES Player::move() {
 		else	{ this->coordinates.y = 2; }
 	}
 
+	// this->moves.left = false, this->moves.right = false, this->moves.up = false, this->moves.down = false;
 	return	{ this->coordinates.x, this->coordinates.y };
 }
 
