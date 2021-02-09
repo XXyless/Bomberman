@@ -29,6 +29,13 @@ std::vector <Player*>					players(PLAYER_COUNT);
 bool MOVEMENT_DONE[] = { true, true, true, true, true, true, true, true, true, true };
 bool DRAWING_DONE = true;
 
+void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
+	for (auto x = 0; x < box_width; ++x)
+		for (auto y = 0; y < box_height; ++y)
+			if (x < GAME_WIDTH and y < GAME_HEIGHT)
+				GameScreen(box_x + x, box_y + y) = color;
+}
+
 VOID* Update(LPVOID param) {
 	/*
 	DRAWING_DONE	= false;
@@ -44,18 +51,34 @@ VOID* Update(LPVOID param) {
 	}
 	*/
 	// KUTULAR MUTULAR DRAW
+	for (int j = 50; j < GAME_HEIGHT; j += 100)
+	{
+		for (int i = 50; i < GAME_WIDTH; i += 100)
+		{
+			drawBox(50, 50, i, j, GREY);
+		}
+	}
+	
+	for (int j = 102; j < 449; j += 100)
+	{
+		for (int i = 52; i < 649; i += 100)
+		{
+			drawBox(46, 46, i, j, BROWN);
+		}
+	} 
+
+	for (int j = 52; j < 499; j += 50)
+	{
+		for (int i = 102; i < 549; i += 100)
+		{
+			drawBox(46, 46, i, j, BROWN);
+		}
+	}
+
 	SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
 	// DRAWING_DONE	=	true;
 	return 0;
 }
-
-void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
-	for (auto x = 0; x < box_width; ++x)
-		for (auto y = 0; y < box_height; ++y)
-			if( x < GAME_WIDTH and y < GAME_HEIGHT)
-			GameScreen(box_x + x, box_y + y) = color;
-}
-
 
 
 DWORD WINAPI PlayerThread(LPVOID param) {
@@ -92,8 +115,8 @@ VOID CALLBACK start_game() {
 	for (size_t current_player = 0; current_player < PLAYER_COUNT; current_player++) {
 		// player_moves[current_player].left = false; player_moves[current_player].right = false; player_moves[current_player].up = false; player_moves[current_player].down = false;
 
- 		if		(current_player == 0)	{ x = 100 ;y = GAME_HEIGHT - PLAYER_HEIGHT - 100; c = GREEN; }
-		else if (current_player == 1)	{ x = GAME_WIDTH - PLAYER_WIDTH - 100; y = 100; c = WHITE; }
+ 		if		(current_player == 0)	{ x = 5 ;y = GAME_HEIGHT - PLAYER_HEIGHT - 5; c = GREEN; }
+		else if (current_player == 1)	{ x = GAME_WIDTH - PLAYER_WIDTH - 5; y = 5; c = WHITE; }
 
 		players[current_player] = new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, GAME_WIDTH, GAME_HEIGHT);
 		// player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, NULL, 0, &ThreadID);
@@ -109,7 +132,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg)
 	{
 	case WM_CREATE:
-		Hmainbmp = CreateWindowEx(0, "STATIC", "", WS_CHILD | WS_VISIBLE | SS_BITMAP | WS_THICKFRAME, 1, 23, WINDOW_WIDTH, WINDOW_HEIGHT, hWnd, nullptr, hInst, nullptr);
+		Hmainbmp = CreateWindowEx(0, "STATIC", "", WS_CHILD | WS_VISIBLE | SS_BITMAP | WS_THICKFRAME, 1, 50, GAME_WIDTH, GAME_HEIGHT, hWnd, NULL, hInst, NULL);
 		start_game();
 		break;
 
