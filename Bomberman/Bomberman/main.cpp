@@ -138,15 +138,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (RELEASED_KEY == 'S' or RELEASED_KEY == 's') { players[1]->moves.down = false; }
 		break;
 	
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-
-		default:
-			break;
-		}
-		break;
-
+	
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
