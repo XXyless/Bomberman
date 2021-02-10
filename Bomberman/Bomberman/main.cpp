@@ -38,22 +38,6 @@ void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 				GameScreen(box_x + x, box_y + y) = color;
 }
 
-bool road_open(COORDINATES current_point, int direction) {
-	bool in_range;
-	int x = current_point.x, y = current_point.y; 
-	if (direction == LEFT) { 
-
-	}
-	else if (direction == RIGHT){
-		
-	}
-	else if (direction == UP){
-
-	}
-	else{
-
-	}
-}	
 
 VOID* Update(LPVOID param) {
 	/*
@@ -102,11 +86,30 @@ VOID* Update(LPVOID param) {
 
 DWORD WINAPI PlayerThread(LPVOID param) {
 	Player* myself = reinterpret_cast<Player*>(param);
-
+	std::vector <std::vector<int>> next_line;
 	while (GAME_STARTED) {
 		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, BG_COLOR);
 		//if (DRAWING_DONE) {
 			//MOVEMENT_DONE[my_id]	=	false;
+		if (myself->moves.left) {
+			if (myself->coordinates.x - myself->s > 1) { myself->coordinates.x -= myself->s; }
+			else { myself->coordinates.x = 2; }
+		}
+
+		else if (myself->moves.right) {
+			if (myself->coordinates.x + myself->s + myself->w < myself->area_width) { myself->coordinates.x += myself->s; }
+			else { myself->coordinates.x = myself->area_width - myself->w - 1; }
+		}
+
+		if (myself->moves.up) {
+			if (myself->coordinates.y + myself->s + myself->h < myself->area_height - 2) { myself->coordinates.y += myself->s; }
+			else { myself->coordinates.y = myself->area_height - myself->h - 2; }
+		}
+
+		else if (myself->moves.down) {
+			if (myself->coordinates.y - myself->s > 2) { myself->coordinates.y -= myself->s; }
+			else { myself->coordinates.y = 2; }
+		}
 		myself->move();
 			//MOVEMENT_DONE[my_id] = true;
 		//}
@@ -160,15 +163,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	case WM_KEYDOWN:
 		PRESSED_KEY = (int)wParam;
-		if		(PRESSED_KEY == VK_LEFT)	{ if (road_open(players[0]->coordinates, LEFT))		{ players[0]->moves.left = true; } }
-		else if (PRESSED_KEY == VK_RIGHT)	{ if (road_open(players[0]->coordinates, RIGHT))	{ players[0]->moves.right = true; } }
-		else if (PRESSED_KEY == VK_UP)		{ if (road_open(players[0]->coordinates, UP))		{ players[0]->moves.up = true; } }
-		else if (PRESSED_KEY == VK_DOWN)	{ if (road_open(players[0]->coordinates, DOWN ))	{ players[0]->moves.down = true; } }
+		if		(PRESSED_KEY == VK_LEFT)	{ players[0]->moves.left	= true; }
+		else if (PRESSED_KEY == VK_RIGHT)	{ players[0]->moves.right	= true; }
+		else if (PRESSED_KEY == VK_UP)		{ players[0]->moves.up		= true; }
+		else if (PRESSED_KEY == VK_DOWN)	{ players[0]->moves.down	= true; }
 
-		if		(PRESSED_KEY == 'A' or PRESSED_KEY == 'a') { if (road_open(players[1]->coordinates, LEFT))	{ players[1]->moves.left = true; } }
-		else if (PRESSED_KEY == 'D' or PRESSED_KEY == 'd') { if (road_open(players[1]->coordinates, RIGHT)) { players[1]->moves.right = true; } }
-		else if (PRESSED_KEY == 'W' or PRESSED_KEY == 'w') { if (road_open(players[1]->coordinates, UP))	{ players[1]->moves.up = true; } }
-		else if (PRESSED_KEY == 'S' or PRESSED_KEY == 's') { if (road_open(players[1]->coordinates, DOWN))	{ players[1]->moves.down = true; } }
+		if		(PRESSED_KEY == 'A' or PRESSED_KEY == 'a') { players[1]->moves.left		= true; }
+		else if (PRESSED_KEY == 'D' or PRESSED_KEY == 'd') { players[1]->moves.right	= true; }
+		else if (PRESSED_KEY == 'W' or PRESSED_KEY == 'w') { players[1]->moves.up		= true; }
+		else if (PRESSED_KEY == 'S' or PRESSED_KEY == 's') { players[1]->moves.down		= true; }
 		break;
 	case WM_KEYUP:
 		RELEASED_KEY = (int)wParam;

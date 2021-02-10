@@ -1,4 +1,4 @@
-#ifndef _CHMAT_H_GUARD_
+﻿#ifndef _CHMAT_H_GUARD_
 #define _CHMAT_H_GUARD_
 #pragma once
 
@@ -30,10 +30,14 @@ public:
 	template<typename C>
 	bool checkType(C val) const;
 
+	
+
 	void print_mat();
 	void printnumber(int x0, int y0, int number, int c, int b);
 
 	bool inRange(int x, int y);
+	std::vector<int> getLine(int start_x, int start_y, int height);
+
 
 public:
 	void operator = (T a);
@@ -386,3 +390,14 @@ int FillBMPInfo(BITMAPINFO* info, int x, int y, int bits) {
 	return(0);
 }
 
+template<typename T>
+inline std::vector<int> CHMAT<T>::getLine(int start_x, int start_y, int height) {
+	/*
+	* REFERANS NOKTASINDAN VERİLEN AXİSE GÖRE BELİRTİLEN YÖNDE İSTENİLEN BOYUT KADAR ALANI AL
+	*/
+	std::vector<int> return_arr;
+	for (int y = 0; y < height; ++y)
+		if (x < this->x and y < this->y)
+			return_arr.push_back(this(start_x, start_y + y));
+	return return_arr;
+}
