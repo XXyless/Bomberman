@@ -22,3 +22,8 @@ struct moves {
 
 typedef coordinates COORDINATES;
 typedef moves MOVES;
+
+struct block {
+	COORDINATES coordinates;
+	bool status_changed;
+};

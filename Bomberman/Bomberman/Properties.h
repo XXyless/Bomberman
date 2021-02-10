@@ -52,10 +52,26 @@ _BOOL			PLAYER_DIRECTION_DOWN		=	false;
 
 int				PLAYER_SPEED				=	2;
 
-_SIZE			PLAYER_WIDTH				=	40;
-_SIZE			PLAYER_HEIGHT				=	40;
+_SIZE			PLAYER_WIDTH				=	30;
+_SIZE			PLAYER_HEIGHT				=	30;
 
 COLOR			BG_COLOR					=	BLACK;
 
+
+constexpr int	WALL_COUNT					=	30;
+_SIZE			WALL_COLOR					=	GREY;
+_SIZE			WALL_WIDTH					=	50;			
+_SIZE			WALL_HEIGHT					=	50;			
+
+constexpr int	BRICK_COUNT					=	44 + 25 + 18 + 14 + 6;
+_SIZE			BRICK_COLOR					=	BROWN;
+_SIZE			BRICK_WIDTH					=	50;			
+_SIZE			BRICK_HEIGHT				=	50;			
+
+
+int				LEFT						=	1515;
+int				RIGHT						=	1516;
+int				UP							=	1517;
+int				DOWN						=	1518;
 
 #endif //!PROPERTIES_H
