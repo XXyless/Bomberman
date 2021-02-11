@@ -6,9 +6,11 @@
 #include <random>
 #include "Types.h"
 
+
 class Player
 {
 public:
+	
 	int id;
 	COORDINATES coordinates;
 	_SIZE w, h;
@@ -17,6 +19,7 @@ public:
 	bool moving;
 	int area_width, area_height;
 	MOVES moves;
+
 public:
 	Player(_ID id, int x, int y, _SIZE w, _SIZE h, int s, COLOR c, _SIZE area_width, _SIZE area_height);
 	~Player();

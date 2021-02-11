@@ -26,8 +26,8 @@ LPCTSTR			lpszAppName					=	"PARALLEL PROGRAMMING";
 LPCTSTR			lpszTitle					=	"BOMBERMAN";
 
 
-_SIZE			WINDOW_WIDTH				=	700;
-_SIZE			WINDOW_HEIGHT				=	700;
+_SIZE			WINDOW_WIDTH				=	1000;
+_SIZE			WINDOW_HEIGHT				=	680;
 
 _SIZE			GAME_WIDTH					=	650;
 _SIZE			GAME_HEIGHT					=	550;
@@ -63,15 +63,22 @@ _SIZE			WALL_COLOR					=	GREY;
 _SIZE			WALL_WIDTH					=	50;			
 _SIZE			WALL_HEIGHT					=	50;			
 
-constexpr int	BRICK_COUNT					=	44 + 25 + 18 + 14 + 6;
+constexpr int	BRICK_COUNT					=	38 + 25 + 18 + 14 + 6;
 _SIZE			BRICK_COLOR					=	BROWN;
-_SIZE			BRICK_WIDTH					=	50;			
-_SIZE			BRICK_HEIGHT				=	50;			
+_SIZE			BRICK_WIDTH					=	46;			
+_SIZE			BRICK_HEIGHT				=	46;			
 
 
 int				LEFT						=	1515;
 int				RIGHT						=	1516;
 int				UP							=	1517;
 int				DOWN						=	1518;
+
+
+_SIZE			BOMB_COLOR					=	RED;
+_SIZE			BOMB_WIDTH					=	PLAYER_WIDTH  -  10;
+_SIZE			BOMB_HEIGHT					=	PLAYER_HEIGHT -  10;
+
+
 
 #endif //!PROPERTIES_H

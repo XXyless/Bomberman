@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "Bomb.h"
+
 
 
 Player::Player(_ID id, int x, int y, _SIZE w, _SIZE h, int s, COLOR c, _SIZE area_width, _SIZE area_height) {
@@ -9,7 +11,6 @@ Player::Player(_ID id, int x, int y, _SIZE w, _SIZE h, int s, COLOR c, _SIZE are
 	this->c = c;
 	this->s = s;
 	this->area_width = area_width, this->area_height = area_height;
-
 	this->moves.left = false; this->moves.right = false; this->moves.up = false; this->moves.down = false;
 }
 
@@ -26,12 +27,12 @@ COORDINATES Player::move() {
 COORDINATES Player::move() {
 	
 	if (this->moves.left) {
-		if (this->coordinates.x -	this->s > 1)	{ this->coordinates.x -=	this->s; }
+		if (this->coordinates.x - this->s > 1 )	{ this->coordinates.x -= this->s; }
 		else	{ this->coordinates.x = 2; }
 	}
 
 	else if (this->moves.right) {
-		if (this->coordinates.x + this->s + this->w < this->area_width)	{ this->coordinates.x += this->s; }
+		if (this->coordinates.x + this->s + this->w < this->area_width )	{ this->coordinates.x += this->s; }
 		else	{ this->coordinates.x = this->area_width - this->w - 1; }
 	}
 

@@ -27,3 +27,4 @@ struct block {
 	COORDINATES coordinates;
 	bool status_changed;
 };
+
