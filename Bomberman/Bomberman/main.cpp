@@ -12,7 +12,6 @@
 #include "CHMAT.h"
 #include "Properties.h"
 #include "Player.h"
-#include "Bomb.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);
@@ -24,15 +23,11 @@ HANDLE hTimerQueue = nullptr;
 
 
 HANDLE									player_threads[PLAYER_COUNT];
-HANDLE									bomb_threads[PLAYER_COUNT];
+HANDLE									bomb_threads;
 std::vector <Player*>					players(PLAYER_COUNT);
-std::vector <Bomb*>						bombs(PLAYER_COUNT);
+COORDINATES								bombs;
 // std::vector <MOVES>						player_moves(PLAYER_COUNT);
-std::vector <block>						bricks;
 std::vector <block>						walls;
-
-bool MOVEMENT_DONE[] = { true, true, true, true, true, true, true, true, true, true };
-bool DRAWING_DONE = true;
 
 void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 	for (auto x = 0; x < box_width; ++x)
@@ -68,42 +63,11 @@ DWORD WINAPI PlayerThread(LPVOID param) {
 
 	std::vector <std::vector<int>> next_line;
 	while (GAME_STARTED) {
-
-		if (PRESSED_KEY == VK_SPACE && myself->id == 0)
-		{
-			bombs[0]->bomb_coord.x = myself->coordinates.x;
-			bombs[0]->bomb_coord.y = myself->coordinates.y;
-			bombs[0]->bomb = true;
-		}
-		if (PRESSED_KEY == VK_SHIFT && myself->id == 1)
-		{
-			bombs[1]->bomb_coord.x = myself->coordinates.x;
-			bombs[1]->bomb_coord.y = myself->coordinates.y;
-			bombs[1]->bomb = true;
-		}
+	
 
 		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, BG_COLOR);
 		//if (DRAWING_DONE) {
 			//MOVEMENT_DONE[my_id]	=	false;
-		if (myself->moves.left) {
-			if (myself->coordinates.x - myself->s > 1) { myself->coordinates.x -= myself->s; }
-			else { myself->coordinates.x = 2; }
-		}
-
-		else if (myself->moves.right) {
-			if (myself->coordinates.x + myself->s + myself->w < myself->area_width) { myself->coordinates.x += myself->s; }
-			else { myself->coordinates.x = myself->area_width - myself->w - 1; }
-		}
-
-		if (myself->moves.up) {
-			if (myself->coordinates.y + myself->s + myself->h < myself->area_height - 2) { myself->coordinates.y += myself->s; }
-			else { myself->coordinates.y = myself->area_height - myself->h - 2; }
-		}
-
-		else if (myself->moves.down) {
-			if (myself->coordinates.y - myself->s > 2) { myself->coordinates.y -= myself->s; }
-			else { myself->coordinates.y = 2; }
-		}
 
 		myself->move();
 			//MOVEMENT_DONE[my_id] = true;
@@ -118,16 +82,21 @@ DWORD WINAPI PlayerThread(LPVOID param) {
 }
 
 DWORD WINAPI BombThread(LPVOID param) {
-	Bomb* myself = reinterpret_cast<Bomb*>(param);
+	
+	int	second = 0;
 
-	while (GAME_STARTED)
+	while (GAME_STARTED && second <3)
 	{
-		if (myself->bomb) {
-			drawBox(myself->w, myself->h, myself->bomb_coord.x + 4, myself->bomb_coord.y + 4, myself->c);
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		}
+			
+		drawBox(BOMB_WIDTH, BOMB_HEIGHT,bombs.x + 4 , bombs.y + 4, BOMB_COLOR);
+		//SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
+		second++;
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		drawBox(BOMB_WIDTH, BOMB_HEIGHT, bombs.x + 4, bombs.y + 4, BG_COLOR);
+
 		
 	}
+	
 	return 0;
 }
 
@@ -153,16 +122,12 @@ VOID CALLBACK start_game() {
 				current_wall++;
 			}
 		}
-	}
-
-	current_wall = 0;
-	while (current_wall < BRICK_COUNT )
-	{
+	
 		for (block_y = 102; block_y < 450; block_y += 100)
 		{
 			for (block_x = 52; block_x < 650; block_x += 100)
 			{
-				bricks.push_back({ block_x, block_y, true });
+				walls.push_back({ block_x, block_y, true });
 				drawBox(BRICK_WIDTH, BRICK_HEIGHT, block_x, block_y, BRICK_COLOR);
 				current_wall++;
 			}
@@ -173,7 +138,7 @@ VOID CALLBACK start_game() {
 			for (block_x = 102; block_x < 550; block_x += 100)
 			{
 
-				bricks.push_back({ block_x, block_y, true });
+				walls.push_back({ block_x, block_y, true });
 				drawBox(BRICK_WIDTH, BRICK_HEIGHT, block_x, block_y, BRICK_COLOR);
 				current_wall++;
 			}
@@ -181,26 +146,26 @@ VOID CALLBACK start_game() {
 
 		for (block_y = 3; block_y < 450; block_y += 50)
 		{
-			bricks.push_back({ 3, block_y, true });
+			walls.push_back({ 3, block_y, true });
 			drawBox(BRICK_WIDTH , BRICK_HEIGHT , 3, block_y, BRICK_COLOR);
 			current_wall++;
 		}
 		for (block_y = 103; block_y < GAME_HEIGHT; block_y += 50)
 		{
-			bricks.push_back({ 603, block_y, true });
+			walls.push_back({ 603, block_y, true });
 			drawBox(BRICK_WIDTH, BRICK_HEIGHT, 603, block_y, BRICK_COLOR);
 			current_wall++;
 		}
 
 		for (block_x = 53; block_x < 550; block_x += 50)
 		{
-			bricks.push_back({ block_x, 3, true });
+			walls.push_back({ block_x, 3, true });
 			drawBox(BRICK_WIDTH, BRICK_HEIGHT, block_x, 3, BRICK_COLOR);
 			current_wall++;
 		}
 		for (block_x = 103; block_x < GAME_WIDTH - 50; block_x += 50)
 		{
-			bricks.push_back({ block_x, 503, true });
+			walls.push_back({ block_x, 503, true });
 			drawBox(BRICK_WIDTH, BRICK_HEIGHT, block_x, 503, BRICK_COLOR);
 			current_wall++;
 		}
@@ -215,10 +180,8 @@ VOID CALLBACK start_game() {
 		else if (current_player == 1)	{ x = GAME_WIDTH - PLAYER_WIDTH - 5; y = 5; c = WHITE; }
 
 		players[current_player] = new Player(current_player, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, c, GAME_WIDTH, GAME_HEIGHT);
-		bombs[current_player] = new Bomb(current_player, x, y, BOMB_WIDTH, BOMB_HEIGHT, BOMB_COLOR);
-		// player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, NULL, 0, &ThreadID);
 		player_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlayerThread, reinterpret_cast<void*>(players[current_player]), 0, &ThreadID);
-		bomb_threads[current_player] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, reinterpret_cast<void*>(bombs[current_player]), 0, &ThreadID);
+		
 	}
 	
 	// draw_boxes()
@@ -247,6 +210,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (PRESSED_KEY == 'D' or PRESSED_KEY == 'd') { players[1]->moves.right	= true; }
 		else if (PRESSED_KEY == 'W' or PRESSED_KEY == 'w') { players[1]->moves.up		= true; }
 		else if (PRESSED_KEY == 'S' or PRESSED_KEY == 's') { players[1]->moves.down		= true; }
+
+		if (PRESSED_KEY == VK_SPACE )
+		{
+			bombs.x = players[0]->coordinates.x;
+			bombs.y = players[0]->coordinates.y;
+			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, 0, 0, 0);
+			
+		}
+		if (PRESSED_KEY == VK_SHIFT )
+		{
+			bombs.x = players[1]->coordinates.x;
+			bombs.y = players[1]->coordinates.y;
+			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, 0, 0, 0);
+		}
 
 		break;
 	case WM_KEYUP:
@@ -322,15 +299,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 
 /*
-	 * ------- *
-	  #-#-#-#-#
+	 * ---------
+	  #-#-#-#-#-
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
 	 -#-#-#-#-#-
-	  #-#-#-#-#
-	 * ------- *
+	 -#-#-#-#-#
+	 --------- *
 
 */
 

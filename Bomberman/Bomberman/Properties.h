@@ -58,12 +58,11 @@ _SIZE			PLAYER_HEIGHT				=	30;
 COLOR			BG_COLOR					=	BLACK;
 
 
-constexpr int	WALL_COUNT					=	30;
+constexpr int	WALL_COUNT					=	140;
 _SIZE			WALL_COLOR					=	GREY;
 _SIZE			WALL_WIDTH					=	50;			
 _SIZE			WALL_HEIGHT					=	50;			
 
-constexpr int	BRICK_COUNT					=	38 + 25 + 18 + 14 + 6;
 _SIZE			BRICK_COLOR					=	BROWN;
 _SIZE			BRICK_WIDTH					=	46;			
 _SIZE			BRICK_HEIGHT				=	46;			
