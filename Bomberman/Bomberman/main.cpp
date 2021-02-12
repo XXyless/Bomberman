@@ -28,6 +28,7 @@ std::vector <Player*>					players(PLAYER_COUNT);
 COORDINATES								bombs;
 // std::vector <MOVES>						player_moves(PLAYER_COUNT);
 std::vector <block>						walls;
+_BOOL									BOMB_COUNT[PLAYER_COUNT] = { true, true };
 
 void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 	for (auto x = 0; x < box_width; ++x)
@@ -83,19 +84,23 @@ DWORD WINAPI PlayerThread(LPVOID param) {
 
 DWORD WINAPI BombThread(LPVOID param) {
 	
-	int	second = 0;
+	int	x, y, second = 0;
+	COORDINATES* my_cord = (COORDINATES*)param;
+	x = my_cord->x ;
+	y = my_cord->y ;
 
 	while (GAME_STARTED && second <3)
 	{
 			
-		drawBox(BOMB_WIDTH, BOMB_HEIGHT,bombs.x + 4 , bombs.y + 4, BOMB_COLOR);
+		drawBox(BOMB_WIDTH, BOMB_HEIGHT,my_cord->x + 4 , my_cord->y + 4, BOMB_COLOR);
 		//SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
 		second++;
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		drawBox(BOMB_WIDTH, BOMB_HEIGHT, bombs.x + 4, bombs.y + 4, BG_COLOR);
+		drawBox(BOMB_WIDTH, BOMB_HEIGHT, my_cord->x + 4, my_cord->y + 4, BG_COLOR);
 
-		
 	}
+	BOMB_COUNT[0] = true;
+	BOMB_COUNT[1] = true;
 	
 	return 0;
 }
@@ -211,18 +216,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (PRESSED_KEY == 'W' or PRESSED_KEY == 'w') { players[1]->moves.up		= true; }
 		else if (PRESSED_KEY == 'S' or PRESSED_KEY == 's') { players[1]->moves.down		= true; }
 
-		if (PRESSED_KEY == VK_SPACE )
+		if (PRESSED_KEY == VK_SPACE && BOMB_COUNT[0])
 		{
-			bombs.x = players[0]->coordinates.x;
-			bombs.y = players[0]->coordinates.y;
-			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, 0, 0, 0);
+			bombs = { players[0]->coordinates.x, players[0]->coordinates.y };
+			BOMB_COUNT[0] = false;
+			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, (LPVOID)&bombs, 0, 0);
 			
 		}
-		if (PRESSED_KEY == VK_SHIFT )
+		if (PRESSED_KEY == VK_SHIFT && BOMB_COUNT[1])
 		{
-			bombs.x = players[1]->coordinates.x;
-			bombs.y = players[1]->coordinates.y;
-			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, 0, 0, 0);
+			BOMB_COUNT[1] = false;
+			bombs = { players[1]->coordinates.x, players[1]->coordinates.y };
+			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, (LPVOID)&bombs, 0, 0);
 		}
 
 		break;
