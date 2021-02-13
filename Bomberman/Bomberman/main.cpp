@@ -19,14 +19,13 @@ VOID CALLBACK start_game();
 
 
 CHMAT<int>								GameScreen(GAME_WIDTH, GAME_HEIGHT, BG_COLOR);
+CHMAT<int>								a(GAME_WIDTH, GAME_HEIGHT, BG_COLOR);
 HANDLE hTimerQueue = nullptr;
-
 
 HANDLE									player_threads[PLAYER_COUNT];
 HANDLE									bomb_threads;
 std::vector <Player*>					players(PLAYER_COUNT);
-COORDINATES								bombs;
-// std::vector <MOVES>						player_moves(PLAYER_COUNT);
+COORDINATES								bombs[PLAYER_COUNT];
 std::vector <block>						walls;
 _BOOL									BOMB_COUNT[PLAYER_COUNT] = { true, true };
 
@@ -37,25 +36,21 @@ void drawBox(int box_width, int box_height, int box_x, int box_y, int color) {
 				GameScreen(box_x + x, box_y + y) = color;
 }
 
+void deleteBlock(int x, int y) {
+	int current_pixel = GameScreen.data[y * GameScreen.x + x];
+
+	if (current_pixel != BG_COLOR and current_pixel != WALL_COLOR) {
+		GameScreen(x, y) = BG_COLOR;
+		if (x < GameScreen.x) { deleteBlock(x + 1, y); }
+		if (x > 1) { deleteBlock(x - 1, y); }
+		if (y < GameScreen.y) { deleteBlock(x, y + 1); }
+		if (y > 1) { deleteBlock(x, y - 1); }
+	}
+}
 
 VOID* Update(LPVOID param) {
-	/*
-	DRAWING_DONE	= false;
-	bool wait		= true;
-	while (wait) {
-		for (size_t current_player = 0; current_player < PLAYER_COUNT; current_player++) {
-			if (not MOVEMENT_DONE[current_player]) {
-				wait = true;
-				break;
-			}
-			wait = false;
-		}
-	}
-	*/
-	// KUTULAR MUTULAR DRAW
 
 	SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
-	// DRAWING_DONE	=	true;
 	return 0;
 }
 
@@ -64,15 +59,49 @@ DWORD WINAPI PlayerThread(LPVOID param) {
 
 	std::vector <std::vector<int>> next_line;
 	while (GAME_STARTED) {
-	
+		
+		for (int i = 0; i < PLAYER_WIDTH; i++)
+		{
+			//Player 1
+			if (GameScreen.data[(myself->coordinates.y + i) * GameScreen.x + (myself->coordinates.x + 31)] != BG_COLOR && myself->id == 0)
+			{
+				myself->moves.right = false;
+			}
+			else if (GameScreen.data[(myself->coordinates.y + i) * GameScreen.x + (myself->coordinates.x - 2)] != BG_COLOR && myself->id == 0)
+			{
+				myself->moves.left = false;
+			}
+			else if (GameScreen.data[(myself->coordinates.y + 31) * GameScreen.x + (myself->coordinates.x + i)] != BG_COLOR && myself->id == 0)
+			{
+				myself->moves.up = false;
+			}
+			else if (GameScreen.data[(myself->coordinates.y - 2) * GameScreen.x + (myself->coordinates.x + i)] != BG_COLOR && myself->id == 0)
+			{
+				myself->moves.down = false;
+			}
+			//Player 2
+			else if (GameScreen.data[(myself->coordinates.y + i) * GameScreen.x + (myself->coordinates.x + 31)] != BG_COLOR && myself->id == 1)
+			{
+				myself->moves.right = false;
+			}
+			else if (GameScreen.data[(myself->coordinates.y + i) * GameScreen.x + (myself->coordinates.x - 3)] != BG_COLOR && myself->id == 1)
+			{
+				myself->moves.left = false;
+			}
+			else if (GameScreen.data[(myself->coordinates.y + 31) * GameScreen.x + (myself->coordinates.x + i)] != BG_COLOR && myself->id == 1)
+			{
+				myself->moves.up = false;
+			}
+			else if (GameScreen.data[(myself->coordinates.y - 2) * GameScreen.x + (myself->coordinates.x + i)] != BG_COLOR && myself->id == 1)
+			{
+				myself->moves.down = false;
+			}
 
+		}
+		
 		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, BG_COLOR);
-		//if (DRAWING_DONE) {
-			//MOVEMENT_DONE[my_id]	=	false;
 
 		myself->move();
-			//MOVEMENT_DONE[my_id] = true;
-		//}
 
 		drawBox(PLAYER_WIDTH, PLAYER_HEIGHT, myself->coordinates.x, myself->coordinates.y, myself->c);
 
@@ -89,16 +118,71 @@ DWORD WINAPI BombThread(LPVOID param) {
 	x = my_cord->x ;
 	y = my_cord->y ;
 
-	while (GAME_STARTED && second <3)
+	while (GAME_STARTED && second < 3)
 	{
-			
-		drawBox(BOMB_WIDTH, BOMB_HEIGHT,my_cord->x + 4 , my_cord->y + 4, BOMB_COLOR);
-		//SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
-		second++;
+
+		drawBox(BOMB_WIDTH, BOMB_HEIGHT,my_cord->x + 5, my_cord->y + 5, BOMB_COLOR);
+		second ++;
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		drawBox(BOMB_WIDTH, BOMB_HEIGHT, my_cord->x + 4, my_cord->y + 4, BG_COLOR);
+		//deleteBlock(my_cord->x + 30, my_cord->y );
+		drawBox(BOMB_WIDTH, BOMB_HEIGHT, my_cord->x + 5, my_cord->y + 5, BG_COLOR);
 
 	}
+	if (my_cord->x + 41 < GAME_WIDTH && my_cord->y + 41 < GAME_HEIGHT && my_cord->x - 41 > 1 && my_cord->y - 41 > 1)
+	{
+
+		for (int i = 0; i < BOMB_WIDTH + 30; i++)
+		{
+			//Player 1
+			if (GameScreen.data[(my_cord->y + i) * GameScreen.x + (my_cord->x + 40)] == WHITE)
+			{
+				SetWindowText(hEdit, "PLAYER 1 (GREEN) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y + i) * GameScreen.x + (my_cord->x - 40)] == WHITE)
+			{
+				SetWindowText(hEdit, "PLAYER 1 (GREEN) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y + 40) * GameScreen.x + (my_cord->x + i)] == WHITE)
+			{
+				SetWindowText(hEdit, "PLAYER 1 (GREEN) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y - 40) * GameScreen.x + (my_cord->x + i)] == WHITE)
+			{
+				SetWindowText(hEdit, "PLAYER 1 (GREEN) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y + i) * GameScreen.x + (my_cord->x + 40)] == GREEN)
+			{
+				SetWindowText(hEdit, "PLAYER 2 (WHITE) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y + i) * GameScreen.x + (my_cord->x - 40)] == GREEN)
+			{
+				SetWindowText(hEdit, "PLAYER 2 (WHITE) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y + 40) * GameScreen.x + (my_cord->x + i)] == GREEN)
+			{
+				SetWindowText(hEdit, "PLAYER 2 (WHITE) WIN !!!");
+				return 0;
+			}
+			else if (GameScreen.data[(my_cord->y - 40) * GameScreen.x + (my_cord->x + i)] == GREEN)
+			{
+				SetWindowText(hEdit, "PLAYER 2 (WHITE) WIN !!!");
+				return 0;
+			}
+
+		}
+		drawBox(BOMB_WIDTH + 20, BOMB_HEIGHT + 20, my_cord->x, my_cord->y, BOMB_COLOR);
+		drawBox(BOMB_WIDTH + 20, BOMB_HEIGHT + 20, my_cord->x - BOMB_WIDTH, my_cord->y - BOMB_HEIGHT, BOMB_COLOR);
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		drawBox(BOMB_WIDTH + 20, BOMB_HEIGHT + 20, my_cord->x, my_cord->y, BG_COLOR);
+		drawBox(BOMB_WIDTH + 20, BOMB_HEIGHT + 20, my_cord->x - BOMB_WIDTH, my_cord->y - BOMB_HEIGHT, BG_COLOR);
+	}
+	
 	BOMB_COUNT[0] = true;
 	BOMB_COUNT[1] = true;
 	
@@ -113,7 +197,6 @@ VOID CALLBACK start_game() {
 	
 	GAME_STARTED = true;
 
-	// SendMessage(Hmainbmp, STM_SETIMAGE, 0, (LPARAM)GameScreen.HBitmap);
 	int block_x, block_y, current_wall = 0;
 	
 	while (current_wall < WALL_COUNT)
@@ -218,16 +301,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		if (PRESSED_KEY == VK_SPACE && BOMB_COUNT[0])
 		{
-			bombs = { players[0]->coordinates.x, players[0]->coordinates.y };
+			bombs[0] = { players[0]->coordinates.x, players[0]->coordinates.y };
 			BOMB_COUNT[0] = false;
-			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, (LPVOID)&bombs, 0, 0);
+			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, (LPVOID)&bombs[0], 0, 0);
 			
 		}
 		if (PRESSED_KEY == VK_SHIFT && BOMB_COUNT[1])
 		{
 			BOMB_COUNT[1] = false;
-			bombs = { players[1]->coordinates.x, players[1]->coordinates.y };
-			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, (LPVOID)&bombs, 0, 0);
+			bombs[1] = { players[1]->coordinates.x, players[1]->coordinates.y };
+			bomb_threads = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)BombThread, (LPVOID)&bombs[1], 0, 0);
 		}
 
 		break;
